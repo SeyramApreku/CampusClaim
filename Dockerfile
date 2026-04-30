@@ -1,15 +1,30 @@
 FROM php:8.2-apache
 
-# Install mysqli and pdo_mysql extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql && \
-    docker-php-ext-enable mysqli pdo_mysql
+# Install required PHP extensions
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Disable conflicting MPM modules FIRST before copying files
-RUN a2dismod mpm_event mpm_worker 2>/dev/null || true && \
-    a2enmod mpm_prefork
+# Create a custom Apache configuration to prevent MPM conflicts
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Enable Apache mod_rewrite
+# Copy application files
+COPY . /var/www/html/
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
+
+# Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Now copy application files to Apache's document root
-COPY . /var/www/html/
+# Create a startup script to handle MPM cleanup
+RUN echo '#!/bin/bash\n\
+# Remove all MPM modules first\n\
+a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true\n\
+# Enable only prefork\n\
+a2enmod mpm_prefork\n\
+# Start Apache\n\
+apache2-foreground' > /start.sh && chmod +x /start.sh
+
+EXPOSE 80
+
+CMD ["/start.sh"]
