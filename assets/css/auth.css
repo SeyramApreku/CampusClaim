@@ -1,0 +1,187 @@
+/* ============================================================
+   auth.css — Styles for login.php and register.php
+   Split layout: left brand panel + right form panel
+   ============================================================ */
+
+/* ── Full-height split layout ── */
+.auth-body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+}
+
+.auth-split {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Left crimson brand panel ── */
+.auth-panel {
+    width: 42%;
+    background: linear-gradient(160deg, var(--crimson-dark) 0%, var(--crimson) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative background circle */
+.auth-panel::before {
+    content: '';
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    top: -80px;
+    right: -80px;
+}
+
+.auth-panel::after {
+    content: '';
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    bottom: -60px;
+    left: -60px;
+}
+
+.auth-panel-content {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.25rem;
+    color: white;
+}
+
+.auth-logo span {
+    color: var(--gold);
+}
+
+.auth-tagline {
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.88;
+    max-width: 280px;
+    margin-bottom: 2.5rem;
+}
+
+.auth-panel-links a {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.auth-panel-links a:hover {
+    text-decoration: underline;
+}
+
+.auth-panel-links p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* ── Right form panel ── */
+.auth-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+    background: var(--white);
+}
+
+.auth-form-box {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 0.3rem;
+}
+
+.auth-subtitle {
+    color: var(--grey);
+    font-size: 0.92rem;
+    margin-bottom: 1.75rem;
+}
+
+/* ── Password show/hide toggle ── */
+.input-with-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-toggle .form-control {
+    padding-right: 4rem;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--crimson);
+    font-family: 'Inter', sans-serif;
+    padding: 0;
+}
+
+.toggle-password:hover {
+    text-decoration: underline;
+}
+
+/* ── Switch link below form ── */
+.auth-switch {
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--grey);
+    margin-top: 1.25rem;
+}
+
+.auth-switch a {
+    font-weight: 600;
+}
+
+/* ── Responsive: stack on small screens ── */
+@media (max-width: 768px) {
+    .auth-split {
+        flex-direction: column;
+    }
+
+    .auth-panel {
+        width: 100%;
+        min-height: 200px;
+        padding: 2rem 1.5rem;
+    }
+
+    .auth-panel::before,
+    .auth-panel::after {
+        display: none;
+    }
+
+    .auth-tagline {
+        display: none;
+    }
+
+    .auth-form-side {
+        padding: 2rem 1.25rem;
+    }
+}

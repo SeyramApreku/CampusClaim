@@ -1,0 +1,486 @@
+/* ============================================================
+   style.css — Global Styles for Ashesi Lost & Found
+   Brand colours:
+     Crimson  #C0272D
+     Gold     #F0A500
+     Light BG #F4F4F8
+     Dark text #1A1A2E
+   Font: Inter (Google Fonts)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+@import url('components.css');
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --crimson: #C0272D;
+    --crimson-dark: #9e1f24;
+    --gold: #F0A500;
+    --bg: #F4F4F8;
+    --white: #FFFFFF;
+    --dark: #1A1A2E;
+    --grey: #6B7280;
+    --border: #E5E7EB;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--dark);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--crimson);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* ── Typography ── */
+h1,
+h2,
+h3 {
+    font-family: 'Syne', sans-serif;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.15rem;
+}
+
+/* ── Layout Helpers ── */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.page-wrapper {
+    padding-top: 80px;
+    /* offset for fixed header */
+    padding-bottom: 2rem;
+}
+
+/* ── Header / Nav ── */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--white);
+    border-bottom: 2px solid var(--crimson);
+    box-shadow: var(--shadow);
+    height: 64px;
+    display: flex;
+    align-items: center;
+}
+
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.site-header .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--crimson);
+}
+
+.site-header .logo span {
+    color: var(--gold);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--dark);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: var(--crimson);
+    text-decoration: none;
+}
+
+.nav-links .btn-nav {
+    background: var(--crimson);
+    color: var(--white);
+    padding: 0.45rem 1.1rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+}
+
+.nav-links .btn-nav:hover {
+    background: var(--crimson-dark);
+}
+
+/* Notification bell */
+.notif-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: var(--dark);
+    background: none;
+    border: none;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    background: var(--crimson);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 17px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Cards ── */
+.card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-body {
+    padding: 1rem 1.1rem;
+}
+
+.card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+/* ── Badges ── */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge-lost {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-found {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-active {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-claimed {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.badge-resolved {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* ── Buttons ── */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background: var(--crimson);
+    color: var(--white);
+    border-color: var(--crimson);
+}
+
+.btn-primary:hover {
+    background: var(--crimson-dark);
+    border-color: var(--crimson-dark);
+    text-decoration: none;
+    color: var(--white);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--crimson);
+    border-color: var(--crimson);
+}
+
+.btn-outline:hover {
+    background: var(--crimson);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-gold {
+    background: var(--gold);
+    color: var(--dark);
+    border-color: var(--gold);
+}
+
+.btn-gold:hover {
+    background: #d4900a;
+    text-decoration: none;
+}
+
+.btn-sm {
+    padding: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+}
+
+.btn-full {
+    width: 100%;
+    text-align: center;
+}
+
+/* ── Forms ── */
+.form-group {
+    margin-bottom: 1.1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--dark);
+    background: var(--white);
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--crimson);
+    box-shadow: 0 0 0 3px rgba(192, 39, 45, 0.12);
+}
+
+.form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.form-hint {
+    font-size: 0.78rem;
+    color: var(--grey);
+    margin-top: 0.3rem;
+}
+
+/* ── Alerts / Flash messages ── */
+.alert {
+    padding: 0.85rem 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border-left: 4px solid #22c55e;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-info {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-left: 4px solid #38bdf8;
+}
+
+/* ── Grid for item cards ── */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+/* ── Page section titles ── */
+.section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.section-title span {
+    color: var(--crimson);
+}
+
+/* ── Divider ── */
+.divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 1.5rem 0;
+}
+
+/* ── Utility ── */
+.text-muted {
+    color: var(--grey);
+    font-size: 0.85rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+}
+
+.gap-1 {
+    gap: 0.5rem;
+}
+
+.gap-2 {
+    gap: 1rem;
+}
+
+/* ── Empty State ── */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--grey);
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .items-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .nav-links {
+        gap: 0.75rem;
+    }
+
+    .nav-links li:not(:last-child):not(:nth-last-child(2)) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-wrapper {
+        padding-top: 72px;
+    }
+}
