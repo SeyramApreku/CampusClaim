@@ -43,6 +43,9 @@ abstract class Item {
     public function getStatus() { return $this->status; }
     public function getImageUrl() { return $this->image_url; }
     public function getCreatedAt() { return $this->created_at; }
+    
+    // Setters
+    public function setId($id) { $this->item_id = $id; }
 
     // Abstract method that children must implement
     abstract public function getDisplayBadge();
