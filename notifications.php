@@ -71,6 +71,11 @@ require_once 'includes/header.php';
                                 <?= date('M j, Y \a\t g:ia', strtotime($n['created_at'])) ?>
                             </small>
                         </div>
+                        <?php if ($n['link']): ?>
+                            <a href="<?= htmlspecialchars($n['link']) ?>" class="btn btn-primary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; white-space: nowrap; margin-left: 1rem;">
+                                View
+                            </a>
+                        <?php endif; ?>
                         <?php if (!$n['is_read']): ?>
                             <a href="notifications.php?mark=<?= (int)$n['notification_id'] ?>"
                                class="btn btn-outline" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; white-space: nowrap; margin-left: 1rem;">

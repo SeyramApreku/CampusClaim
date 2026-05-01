@@ -1,20 +1,21 @@
 <?php
-// my_items.php
-// View and manage items reported by the logged-in user.
+require_once 'classes/Database.php';
+$pdo = Database::getInstance()->getConnection();
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: auth/login.php");
+    exit;
+}
 
 require_once 'classes/ItemDAO.php';
 
-// Set page title before including header
-$pageTitle = 'My Items';
-require_once 'includes/header.php';
-
 $itemDAO = new ItemDAO();
-$userId = $_SESSION['user_id'];
+$userId  = $_SESSION['user_id'];
 $success = '';
-$error = '';
+$error   = '';
 
-// Handle Delete Request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $itemId = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
     if ($itemId) {
         if ($itemDAO->deleteItem($itemId, $userId)) {
@@ -25,14 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-
-$myItems = $itemDAO->getItemsByUserId($userId);
+$myItems   = $itemDAO->getItemsByUserId($userId);
+$pageTitle = 'My Items';
+require_once 'includes/header.php';
 ?>
 
 <div class="page-wrapper">
     <div class="container">
-        
-        <div class="dashboard-header" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h1>My Items</h1>
                 <p class="text-muted">Manage the items you have reported.</p>
@@ -48,12 +50,12 @@ $myItems = $itemDAO->getItemsByUserId($userId);
         <?php endif; ?>
 
         <?php if (empty($myItems)): ?>
-            <div class="empty-state" style="text-align: center; padding: 4rem; background: var(--white); border-radius: 8px; box-shadow: var(--shadow);">
+            <div style="text-align: center; padding: 4rem; background: var(--white); border-radius: 8px; box-shadow: var(--shadow);">
                 <p class="text-muted" style="margin-bottom: 1rem;">You haven't reported any items yet.</p>
-                <a href="items/report.php" class="btn btn-outline-primary">Get Started</a>
+                <a href="items/report.php" class="btn btn-outline">Get Started</a>
             </div>
         <?php else: ?>
-            <div class="table-responsive" style="background: var(--white); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;">
+            <div style="background: var(--white); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead>
                         <tr style="background: var(--gray-light); border-bottom: 2px solid var(--gray);">
@@ -68,7 +70,9 @@ $myItems = $itemDAO->getItemsByUserId($userId);
                         <?php foreach ($myItems as $item): ?>
                             <tr style="border-bottom: 1px solid var(--gray-light);">
                                 <td style="padding: 1rem;">
-                                    <span class="badge badge-<?= $item['type'] === 'lost' ? 'danger' : 'success' ?>" style="font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: <?= $item['type'] === 'lost' ? '#fee2e2' : '#dcfce7' ?>; color: <?= $item['type'] === 'lost' ? '#991b1b' : '#166534' ?>;">
+                                    <span style="font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 4px;
+                                        background: <?= $item['type'] === 'lost' ? '#fee2e2' : '#dcfce7' ?>;
+                                        color: <?= $item['type'] === 'lost' ? '#991b1b' : '#166534' ?>;">
                                         <?= ucfirst($item['type']) ?>
                                     </span>
                                 </td>
@@ -86,10 +90,13 @@ $myItems = $itemDAO->getItemsByUserId($userId);
                                     </span>
                                 </td>
                                 <td style="padding: 1rem; text-align: right;">
-                                    <form method="POST" action="my_items.php" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this report? This cannot be undone.');">
+                                    <form method="POST" action="my_items.php" style="display: inline-block;"
+                                          onsubmit="return confirm('Delete this report? This cannot be undone.');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
-                                        <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                                        <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer;">
+                                            Delete
+                                        </button>
                                     </form>
                                 </td>
                             </tr>

@@ -95,7 +95,7 @@ class ItemDAO {
         return $stmt->fetchAll();
     }
 
-    // Fetch a single item by ID with joined details
+    // Get specific item details by ID
     public function getItemById($item_id) {
         $sql = "SELECT i.*, c.category_name, l.location_name, u.name as reporter_name 
                 FROM items i
@@ -131,7 +131,7 @@ class ItemDAO {
         return $stmt->fetchAll();
     }
 
-    // --- Dashboard / Stats Methods ---
+    // Dashboard statistics and user activity
 
     public function getActiveReportsCount($userId) {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM items WHERE user_id = :id AND status = 'open'");
@@ -178,7 +178,7 @@ class ItemDAO {
         ]);
     }
 
-    // --- Admin / Workflow Methods ---
+    // Admin and workflow helper methods
 
     // Update the status of an item (e.g. from 'open' to 'claimed' or 'resolved')
     public function updateItemStatus($item_id, $status) {

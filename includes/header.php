@@ -51,7 +51,7 @@ $base = $inSubfolder ? '../' : '';
                 <li><a href="<?= $base ?>items/report.php">Report Item</a></li>
 
                 <?php if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin'): ?>
-                    <li><a href="<?= $base ?>user/my_items.php">My Items</a></li>
+                    <li><a href="<?= $base ?>my_items.php">My Items</a></li>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>

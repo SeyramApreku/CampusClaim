@@ -73,6 +73,15 @@ require_once '../includes/header.php';
                                         </form>
                                         <form method="POST" action="process_claim.php" style="display: inline;">
                                             <input type="hidden" name="claim_id" value="<?= $claim['claim_id'] ?>">
+                                            <input type="hidden" name="item_id"  value="<?= $claim['item_id'] ?>">
+                                            <input type="hidden" name="action"   value="notify_library">
+                                            <button type="submit" class="btn" style="padding: 0.5rem 1rem; background: #3b82f6; color: white;"
+                                                onclick="return confirm('Send notification to claimant to visit the library?');">
+                                                Request Library Visit
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="process_claim.php" style="display: inline;">
+                                            <input type="hidden" name="claim_id" value="<?= $claim['claim_id'] ?>">
                                             <input type="hidden" name="action"   value="reject">
                                             <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem; color: #c62828; border-color: #c62828;"
                                                 onclick="return confirm('Reject this claim?');">
