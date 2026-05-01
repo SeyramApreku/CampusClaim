@@ -1,13 +1,16 @@
 <?php
 // items/report.php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
 require_once '../classes/ItemDAO.php';
 require_once '../classes/ItemFactory.php';
+
+// Set page title before including header
+$pageTitle = 'Report Item';
+require_once '../includes/header.php';
+require_once '../classes/Database.php';
+
+// Get database connection
+$db = Database::getInstance();
+$pdo = $db->getConnection();
 
 $itemDAO = new ItemDAO();
 $categories = $itemDAO->getCategories();
@@ -100,30 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Item | CampusClaim</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-    </style>
-</head>
-<body style="background-color: #f4f7f6;">
-    <div class="form-container">
-        <h2>Report an Item</h2>
-        <p>Did you lose something or find something? Let the community know.</p>
+<!-- Main content starts here -->
+<div class="form-container" style="max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <h2>Report an Item</h2>
+    <p>Did you lose something or find something? Let the community know.</p>
 
         <?php if (!empty($errors)): ?>
             <div class="alert alert-error">
@@ -187,5 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
     </div>
-</body>
-</html>
+</div>
+
+<?php require_once '../includes/footer.php'; ?>

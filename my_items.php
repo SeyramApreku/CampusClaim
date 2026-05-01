@@ -1,14 +1,12 @@
 <?php
-// user/my_items.php
+// my_items.php
 // View and manage items reported by the logged-in user.
 
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once 'classes/ItemDAO.php';
 
-require_once '../classes/ItemDAO.php';
+// Set page title before including header
+$pageTitle = 'My Items';
+require_once 'includes/header.php';
 
 $itemDAO = new ItemDAO();
 $userId = $_SESSION['user_id'];
@@ -27,10 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-$myItems = $itemDAO->getItemsByUserId($userId);
 
-$pageTitle = 'My Items';
-require_once '../includes/header.php';
+$myItems = $itemDAO->getItemsByUserId($userId);
 ?>
 
 <div class="page-wrapper">
@@ -41,7 +37,7 @@ require_once '../includes/header.php';
                 <h1>My Items</h1>
                 <p class="text-muted">Manage the items you have reported.</p>
             </div>
-            <a href="../items/report.php" class="btn btn-primary">Report New Item</a>
+            <a href="items/report.php" class="btn btn-primary">Report New Item</a>
         </div>
 
         <?php if ($success): ?>
@@ -54,7 +50,7 @@ require_once '../includes/header.php';
         <?php if (empty($myItems)): ?>
             <div class="empty-state" style="text-align: center; padding: 4rem; background: var(--white); border-radius: 8px; box-shadow: var(--shadow);">
                 <p class="text-muted" style="margin-bottom: 1rem;">You haven't reported any items yet.</p>
-                <a href="../items/report.php" class="btn btn-outline-primary">Get Started</a>
+                <a href="items/report.php" class="btn btn-outline-primary">Get Started</a>
             </div>
         <?php else: ?>
             <div class="table-responsive" style="background: var(--white); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;">
@@ -77,7 +73,7 @@ require_once '../includes/header.php';
                                     </span>
                                 </td>
                                 <td style="padding: 1rem; font-weight: 500;">
-                                    <a href="../items/details.php?id=<?= $item['item_id'] ?>" style="color: var(--crimson); text-decoration: none;">
+                                    <a href="items/details.php?id=<?= $item['item_id'] ?>" style="color: var(--crimson); text-decoration: none;">
                                         <?= htmlspecialchars($item['title']) ?>
                                     </a>
                                 </td>
@@ -106,4 +102,4 @@ require_once '../includes/header.php';
     </div>
 </div>
 
-<?php require_once '../includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>

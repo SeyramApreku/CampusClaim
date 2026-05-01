@@ -36,7 +36,7 @@ class StudentUser extends User {
     }
 
     public function getDashboardUrl() {
-        return '../user/dashboard.php';
+        return '../items/browse.php';
     }
 }
 
