@@ -1,5 +1,5 @@
 <?php
-// Landing/Home page for Ashesi Lost & Found
+// Landing/Home page for CampusClaim
 // Redirects to browse if logged in, otherwise shows welcome screen.
 
 session_start();
@@ -14,7 +14,7 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashesi Lost &amp; Found</title>
+    <title>CampusClaim</title>
     <meta name="description" content="Centralized lost and found platform for Ashesi University students.">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/landing.css">
@@ -23,9 +23,15 @@ if (isset($_SESSION['user_id'])) {
 
 <body>
     <section class="hero">
-        <div class="hero-badge">Ashesi University</div>
+        <div class="hero-badge">CampusClaim</div>
 
-        <div class="hero-logo">Ashesi <span>Lost&amp;Found</span></div>
+        <div class="hero-logo" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="assets/images/logo.png" alt="Ashesi Logo" style="height: 55px; border-radius: 8px;">
+            Campus<span>Claim</span>
+        </div>
+        <p class="hero-sub" style="font-size: 1.5rem; font-weight: 500; margin-bottom: 1rem; margin-top: -1rem;">
+            Ashesi Lost and Found
+        </p>
         <p class="hero-sub">
             The centralized platform to report, search, and recover lost items on campus.
             Made by students, for students.

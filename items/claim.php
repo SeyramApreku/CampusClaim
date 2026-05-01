@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Item | Ashesi Lost & Found</title>
+    <title>Claim Item | CampusClaim</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .form-container {

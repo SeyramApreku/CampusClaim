@@ -54,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Ashesi Lost &amp; Found</title>
-    <meta name="description" content="Create your Ashesi Lost and Found account.">
+    <title>Register | CampusClaim</title>
+    <meta name="description" content="Create your CampusClaim account.">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -67,7 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Left panel — brand -->
         <div class="auth-panel">
             <div class="auth-panel-content">
-                <div class="auth-logo">Ashesi <span>Lost&amp;Found</span></div>
+                <div class="auth-logo" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                    <img src="../assets/images/logo.png" alt="Ashesi Logo" style="height: 40px; border-radius: 4px;">
+                    Campus<span>Claim</span>
+                </div>
+                <p class="auth-tagline" style="font-size: 1.2rem; font-weight: 500; margin-bottom: 1rem;">
+                    Ashesi Lost and Found
+                </p>
                 <p class="auth-tagline">
                     Reuniting the Ashesi community with their belongings, one report at a time.
                 </p>
@@ -116,10 +122,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="input-with-toggle">
                             <input type="password" id="password" name="password"
                                 class="form-control <?= in_array('Password must be at least 8 characters long.', $errors) ? 'is-invalid' : '' ?>"
-                                placeholder="At least 8 characters" required autocomplete="new-password">
+                                placeholder="Create a password" required autocomplete="new-password" onkeyup="checkPassword(this.value)">
                             <button type="button" class="toggle-password" data-target="password"
                                 aria-label="Toggle password visibility">Show</button>
                         </div>
+                        <ul id="password-criteria" style="list-style-type: none; padding-left: 0; margin-top: 0.5rem; font-size: 0.85rem; color: #666;">
+                            <li id="req-length">❌ At least 8 characters long</li>
+                            <li id="req-upper">❌ At least one uppercase letter</li>
+                            <li id="req-number">❌ At least one number</li>
+                        </ul>
                     </div>
 
                     <div class="form-group">
@@ -142,6 +153,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="../assets/js/auth.js"></script>
+    <script>
+        function checkPassword(pwd) {
+            const reqLength = document.getElementById('req-length');
+            const reqUpper = document.getElementById('req-upper');
+            const reqNumber = document.getElementById('req-number');
+
+            if (pwd.length >= 8) {
+                reqLength.innerHTML = '✅ At least 8 characters long';
+                reqLength.style.color = 'green';
+            } else {
+                reqLength.innerHTML = '❌ At least 8 characters long';
+                reqLength.style.color = '#666';
+            }
+
+            if (/[A-Z]/.test(pwd)) {
+                reqUpper.innerHTML = '✅ At least one uppercase letter';
+                reqUpper.style.color = 'green';
+            } else {
+                reqUpper.innerHTML = '❌ At least one uppercase letter';
+                reqUpper.style.color = '#666';
+            }
+
+            if (/\d/.test(pwd)) {
+                reqNumber.innerHTML = '✅ At least one number';
+                reqNumber.style.color = 'green';
+            } else {
+                reqNumber.innerHTML = '❌ At least one number';
+                reqNumber.style.color = '#666';
+            }
+        }
+    </script>
 </body>
 
 </html>

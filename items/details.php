@@ -33,7 +33,7 @@ $hasClaimed = $claimDAO->hasUserClaimedItem($_SESSION['user_id'], $item_id);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($itemObj->getTitle()) ?> | Ashesi Lost & Found</title>
+    <title><?= htmlspecialchars($itemObj->getTitle()) ?> | CampusClaim</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .details-container {

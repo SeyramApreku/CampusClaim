@@ -49,8 +49,8 @@ class ItemDAO {
         return false;
     }
 
-    // Fetch all open items with category and location names, with optional search query
-    public function getAllOpenItems($search_query = '') {
+    // Fetch all open items with category and location names, with optional search query and filters
+    public function getAllOpenItems($search_query = '', $filters = []) {
         $sql = "SELECT i.*, c.category_name, l.location_name, u.name as reporter_name 
                 FROM items i
                 JOIN categories c ON i.category_id = c.category_id
@@ -58,27 +58,33 @@ class ItemDAO {
                 JOIN users u ON i.user_id = u.user_id
                 WHERE i.status = 'open'";
                 
+        $params = [];
+        
         if (!empty($search_query)) {
             $sql .= " AND (i.title LIKE :query OR i.description LIKE :query)";
+            $params[':query'] = "%" . $search_query . "%";
+        }
+        
+        if (!empty($filters['type'])) {
+            $sql .= " AND i.type = :type";
+            $params[':type'] = $filters['type'];
+        }
+        
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND i.category_id = :category_id";
+            $params[':category_id'] = $filters['category_id'];
+        }
+        
+        if (!empty($filters['location_id'])) {
+            $sql .= " AND i.location_id = :location_id";
+            $params[':location_id'] = $filters['location_id'];
         }
         
         $sql .= " ORDER BY i.created_at DESC";
         
         $stmt = $this->db->prepare($sql);
-        
-        if (!empty($search_query)) {
-            $stmt->execute([':query' => "%" . $search_query . "%"]);
-        } else {
-            $stmt->execute();
-        }
-        
-        $rows = $stmt->fetchAll();
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = $row; 
-        }
-        return $items;
+        $stmt->execute($params);
+        return $stmt->fetchAll();
     }
 
     // Fetch a single item by ID with joined details
@@ -115,6 +121,53 @@ class ItemDAO {
             ':loc_id' => $location_id
         ]);
         return $stmt->fetchAll();
+    }
+
+    // --- Dashboard / Stats Methods ---
+
+    public function getActiveReportsCount($userId) {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM items WHERE user_id = :id AND status = 'open'");
+        $stmt->execute([':id' => $userId]);
+        return $stmt->fetchColumn();
+    }
+
+    public function getRecoveredItemsCount($userId) {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM items WHERE user_id = :id AND status = 'claimed'");
+        $stmt->execute([':id' => $userId]);
+        return $stmt->fetchColumn();
+    }
+
+    public function getRecentActivity($userId) {
+        $stmt = $this->db->prepare("
+            SELECT item_id, title, type, status, created_at 
+            FROM items 
+            WHERE user_id = :id 
+            ORDER BY created_at DESC 
+            LIMIT 5
+        ");
+        $stmt->execute([':id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    public function getItemsByUserId($userId) {
+        $sql = "SELECT i.*, c.category_name, l.location_name 
+                FROM items i
+                JOIN categories c ON i.category_id = c.category_id
+                JOIN locations l ON i.location_id = l.location_id
+                WHERE i.user_id = :user_id
+                ORDER BY i.created_at DESC";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    public function deleteItem($item_id, $user_id) {
+        $stmt = $this->db->prepare("DELETE FROM items WHERE item_id = :id AND user_id = :uid");
+        return $stmt->execute([
+            ':id' => $item_id,
+            ':uid' => $user_id
+        ]);
     }
 
     // --- Admin / Workflow Methods ---

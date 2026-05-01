@@ -1,6 +1,7 @@
 <?php
 // classes/Database.php
 // Implements the Singleton Design Pattern
+
 class Database
 {
     private static $instance = null;
@@ -9,16 +10,11 @@ class Database
     // Private constructor prevents direct instantiation
     private function __construct()
     {
-        $host = getenv('MYSQLHOST');
-        $port = getenv('MYSQLPORT');
-        $db_name = getenv('MYSQLDATABASE');
-        $username = getenv('MYSQLUSER');
-        $password = getenv('MYSQLPASSWORD');
-
-        // Validate that all required environment variables are set
-        if (!$host || !$port || !$db_name || !$username || !$password) {
-            die("Database configuration error: Missing required environment variables");
-        }
+        $host = getenv('MYSQLHOST') ?: 'railway';
+        $port = getenv('MYSQLPORT') ?: '3306';
+        $db_name = getenv('MYSQLDATABASE') ?: 'railway';
+        $username = getenv('MYSQLUSER') ?: 'SeyramApreku';
+        $password = getenv('MYSQLPASSWORD') ?: 'sGFx5dHTpVs0iPEg';
 
         try {
             $this->pdo = new PDO(

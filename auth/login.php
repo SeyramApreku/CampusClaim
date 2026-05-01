@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In | Ashesi Lost &amp; Found</title>
-    <meta name="description" content="Log in to the Ashesi Lost and Found platform.">
+    <title>Log In | CampusClaim</title>
+    <meta name="description" content="Log in to the CampusClaim platform.">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -61,7 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Left panel — brand -->
         <div class="auth-panel">
             <div class="auth-panel-content">
-                <div class="auth-logo">Ashesi <span>Lost&amp;Found</span></div>
+                <div class="auth-logo" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                    <img src="../assets/images/logo.png" alt="Ashesi Logo" style="height: 40px; border-radius: 4px;">
+                    Campus<span>Claim</span>
+                </div>
+                <p class="auth-tagline" style="font-size: 1.2rem; font-weight: 500; margin-bottom: 1rem;">
+                    Ashesi Lost and Found
+                </p>
                 <p class="auth-tagline">
                     Reuniting the Ashesi community with their belongings, one report at a time.
                 </p>

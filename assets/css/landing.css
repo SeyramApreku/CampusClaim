@@ -1,8 +1,6 @@
-/* ============================================================
-   landing.css — Styles for index.php (public landing page)
-   ============================================================ */
 
-/* ── Hero section ── */
+
+
 .hero {
     display: flex;
     flex-direction: column;
@@ -40,7 +38,7 @@
     justify-content: center;
 }
 
-/* White-border variant of btn-outline used on dark hero background */
+
 .btn-outline-white {
     background: transparent;
     color: white;
@@ -72,7 +70,7 @@
     letter-spacing: 0.05em;
 }
 
-/* ── Feature cards row ── */
+
 .features {
     display: flex;
     gap: 1.25rem;

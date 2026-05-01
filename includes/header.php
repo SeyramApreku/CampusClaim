@@ -34,7 +34,7 @@ if (isset($pdo)) {
 }
 
 // ── Page title (fallback) ──
-$pageTitle = $pageTitle ?? 'Ashesi Lost & Found';
+$pageTitle = $pageTitle ?? 'CampusClaim';
 
 // ── Determine base path for assets (root vs sub-folder) ──
 // Pages in sub-folders (auth/, items/, admin/) need '../' prefix
@@ -47,7 +47,7 @@ $base = $inSubfolder ? '../' : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> | Ashesi Lost &amp; Found</title>
+    <title><?= htmlspecialchars($pageTitle) ?> | CampusClaim</title>
     <meta name="description" content="Centralized lost and found platform for Ashesi University students.">
     <link rel="stylesheet" href="<?= $base ?>assets/css/style.css">
     <!-- Phosphor Icons (lightweight icon set) -->
@@ -63,8 +63,9 @@ $base = $inSubfolder ? '../' : '';
         <div class="container">
 
             <!-- Logo -->
-            <a href="<?= $base ?>index.php" class="logo">
-                Ashesi <span>Lost&amp;Found</span>
+            <a href="<?= htmlspecialchars($base) ?>index.php" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                <img src="<?= htmlspecialchars($base) ?>assets/images/logo.png" alt="Ashesi Logo" style="height: 35px; border-radius: 4px;">
+                Campus<span>Claim</span>
             </a>
 
             <!-- Navigation links -->

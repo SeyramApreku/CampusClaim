@@ -1,9 +1,9 @@
-/* ── Nav bell wrapper (replaces inline style="position:relative") ── */
+
 .nav-bell-wrap {
     position: relative;
 }
 
-/* ── Site footer ── */
+
 .site-footer {
     text-align: center;
     padding: 1.5rem;
@@ -13,10 +13,7 @@
     margin-top: 2rem;
 }
 
-/* ── Notification Dropdown (injected into header.php) ──
-   Add this to style.css, or keep in a separate file and @import.
-   These styles power the bell icon dropdown in the site header.
-*/
+
 
 .notif-dropdown {
     display: none;

@@ -1,8 +1,8 @@
-// main.js — Global JavaScript for Ashesi Lost & Found
+// Global JavaScript for CampusClaim
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── 1. Auto-dismiss flash/alert messages after 4 seconds ──
+    // 1. Auto-dismiss flash/alert messages after 4 seconds
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(function (alert) {
         setTimeout(function () {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     });
 
-    // ── 2. Image upload preview ──
+    // 2. Image upload preview 
     // Used on report.php — shows a thumbnail before form submit
     const imageInput = document.getElementById('item_image');
     const imagePreview = document.getElementById('image-preview');
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── 3. Notification bell dropdown toggle ──
+    // 3. Notification bell dropdown toggle 
     const bell = document.getElementById('notif-bell');
     const notifDropdown = document.getElementById('notif-dropdown');
     if (bell && notifDropdown) {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── 4. Lost/Found toggle on report form ──
+    // 4. Lost/Found toggle on report form
     const toggleBtns = document.querySelectorAll('.type-toggle-btn');
     const typeInput = document.getElementById('item_type');
     toggleBtns.forEach(function (btn) {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ── 5. Confirm before deleting (admin) ──
+    // 5. Confirm before deleting (admin) 
     const deleteForms = document.querySelectorAll('.delete-confirm-form');
     deleteForms.forEach(function (form) {
         form.addEventListener('submit', function (e) {

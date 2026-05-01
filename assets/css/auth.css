@@ -1,9 +1,6 @@
-/* ============================================================
-   auth.css — Styles for login.php and register.php
-   Split layout: left brand panel + right form panel
-   ============================================================ */
 
-/* ── Full-height split layout ── */
+
+
 .auth-body {
     min-height: 100vh;
     margin: 0;
@@ -16,7 +13,7 @@
     min-height: 100vh;
 }
 
-/* ── Left crimson brand panel ── */
+
 .auth-panel {
     width: 42%;
     background: linear-gradient(160deg, var(--crimson-dark) 0%, var(--crimson) 100%);
@@ -29,7 +26,7 @@
     overflow: hidden;
 }
 
-/* Decorative background circle */
+
 .auth-panel::before {
     content: '';
     position: absolute;
@@ -91,7 +88,7 @@
     opacity: 0.9;
 }
 
-/* ── Right form panel ── */
+
 .auth-form-side {
     flex: 1;
     display: flex;
@@ -120,7 +117,7 @@
     margin-bottom: 1.75rem;
 }
 
-/* ── Password show/hide toggle ── */
+
 .input-with-toggle {
     position: relative;
     display: flex;
@@ -148,7 +145,7 @@
     text-decoration: underline;
 }
 
-/* ── Switch link below form ── */
+
 .auth-switch {
     text-align: center;
     font-size: 0.88rem;
@@ -160,7 +157,7 @@
     font-weight: 600;
 }
 
-/* ── Responsive: stack on small screens ── */
+
 @media (max-width: 768px) {
     .auth-split {
         flex-direction: column;

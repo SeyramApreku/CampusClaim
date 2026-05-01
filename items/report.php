@@ -30,16 +30,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Use Factory to generate object
-        $data = [
-            'user_id' => $_SESSION['user_id'],
-            'type' => $type,
-            'title' => $title,
-            'description' => $description,
-            'category_id' => $category_id,
-            'location_id' => $location_id,
-            'item_date' => $item_date
-        ];
+        $image_url = null;
+        
+        // Handle Image Upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = '../assets/uploads/';
+            
+            // Create directory if it doesn't exist
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $fileName = basename($_FILES['image']['name']);
+            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (in_array($fileExt, $allowedExts)) {
+                // Generate unique filename to prevent overwrites
+                $newFileName = uniqid() . '_' . time() . '.' . $fileExt;
+                $targetFilePath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
+                    $image_url = 'assets/uploads/' . $newFileName; // Store relative path for DB
+                } else {
+                    $errors[] = "Error uploading the image.";
+                }
+            } else {
+                $errors[] = "Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed.";
+            }
+        }
+
+        if (empty($errors)) {
+            // Use Factory to generate object
+            $data = [
+                'user_id' => $_SESSION['user_id'],
+                'type' => $type,
+                'title' => $title,
+                'description' => $description,
+                'category_id' => $category_id,
+                'location_id' => $location_id,
+                'item_date' => $item_date,
+                'image_url' => $image_url
+            ];
 
         try {
             $itemObj = ItemFactory::createItem($data);
@@ -68,13 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Item | Ashesi Lost & Found</title>
+    <title>Report Item | CampusClaim</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .form-container {
@@ -98,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="report.php">
+        <form method="POST" action="report.php" enctype="multipart/form-data">
             <div class="form-group" style="margin-bottom: 1rem;">
                 <label>Report Type</label>
                 <select name="type" class="form-control" required style="width: 100%; padding: 0.5rem;">
@@ -140,6 +173,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group" style="margin-bottom: 1.5rem;">
                 <label>Description</label>
                 <textarea name="description" class="form-control" required rows="4" placeholder="Provide details like color, unique marks, etc." style="width: 100%; padding: 0.5rem;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label>Upload Image (Optional)</label>
+                <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/gif, image/webp" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; background: white;">
+                <small style="color: #666; display: block; margin-top: 0.25rem;">Max file size: 5MB. Formats: JPG, PNG, GIF.</small>
             </div>
 
             <div style="display: flex; gap: 1rem;">
