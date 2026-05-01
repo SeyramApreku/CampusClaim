@@ -24,7 +24,8 @@ if (!$data || $data['user_id'] !== $_SESSION['user_id']) {
 }
 
 $itemObj  = ItemFactory::createItem($data);
-$strategy = new ExactLocationCategoryStrategy();
+$itemObj->setId($item_id); // Ensure ID is set for matching logic
+$strategy = new FlexibleMatchingStrategy();
 $matches  = $strategy->findMatches($itemObj, $itemDAO);
 
 $pageTitle = 'Potential Matches';
