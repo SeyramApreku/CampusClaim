@@ -82,9 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_item_id = $itemDAO->createItem($itemObj);
 
                 if ($new_item_id) {
-                    require_once '../classes/MatchingStrategy.php';
-                    $strategy = new ExactLocationCategoryStrategy();
-                    $matches = $strategy->findMatches($itemObj, $itemDAO);
+                    require_once '../classes/MatchingManager.php';
+                    require_once '../classes/NotificationDAO.php';
+                    $itemObj->setId($new_item_id);
+                    $matchingManager = new MatchingManager($itemDAO, new NotificationDAO());
+                    $matches = $matchingManager->runMatching($itemObj);
 
                     header($matches ? "Location: matches.php?id=$new_item_id" : "Location: browse.php?reported=1");
                     exit;

@@ -131,6 +131,33 @@ class ItemDAO {
         return $stmt->fetchAll();
     }
 
+    public function findMatchesByKeywords($targetType, $category_id, $keywords) {
+        $sql = "SELECT i.*, c.category_name, l.location_name, u.name as reporter_name 
+                FROM items i
+                JOIN categories c ON i.category_id = c.category_id
+                JOIN locations l ON i.location_id = l.location_id
+                JOIN users u ON i.user_id = u.user_id
+                WHERE i.status = 'open' 
+                AND i.type = :type 
+                AND i.category_id = :cat_id 
+                AND (";
+        
+        $clauses = [];
+        $params = [':type' => $targetType, ':cat_id' => $category_id];
+
+        foreach ($keywords as $index => $word) {
+            $key = ":word" . $index;
+            $clauses[] = "i.title LIKE $key";
+            $params[$key] = "%" . $word . "%";
+        }
+
+        $sql .= implode(" OR ", $clauses) . ") ORDER BY i.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
     // Dashboard statistics and user activity
 
     public function getActiveReportsCount($userId) {
