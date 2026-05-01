@@ -80,7 +80,15 @@ class ItemDAO {
             $params[':location_id'] = $filters['location_id'];
         }
         
-        $sql .= " ORDER BY i.created_at DESC";
+        $sortMap = [
+            'oldest'   => 'i.created_at ASC',
+            'title_az' => 'i.title ASC',
+            'title_za' => 'i.title DESC',
+            'newest'   => 'i.created_at DESC',
+        ];
+        $orderBy = $sortMap[$filters['sort'] ?? 'newest'] ?? 'i.created_at DESC';
+        $sql .= " ORDER BY $orderBy";
+
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);

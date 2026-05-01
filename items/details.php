@@ -1,5 +1,7 @@
 <?php
-// items/details.php
+require_once '../classes/Database.php';
+$pdo = Database::getInstance()->getConnection();
+
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
@@ -15,82 +17,78 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
-$item_id = $_GET['id'];
-$itemDAO = new ItemDAO();
-$data = $itemDAO->getItemById($item_id);
+$item_id    = (int) $_GET['id'];
+$itemDAO    = new ItemDAO();
+$data       = $itemDAO->getItemById($item_id);
 
-if (!$data) {
-    die("Item not found.");
-}
+if (!$data) { header("Location: browse.php"); exit; }
 
-$itemObj = ItemFactory::createItem($data);
-$claimDAO = new ClaimDAO();
+$itemObj    = ItemFactory::createItem($data);
+$claimDAO   = new ClaimDAO();
 $hasClaimed = $claimDAO->hasUserClaimedItem($_SESSION['user_id'], $item_id);
 
+$pageTitle = htmlspecialchars($itemObj->getTitle());
+require_once '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($itemObj->getTitle()) ?> | CampusClaim</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .details-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            background: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 8px;
-        }
-        .badge-lost { background-color: #ffebee; color: #c62828; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 1rem; }
-        .badge-found { background-color: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 1rem; }
-    </style>
-</head>
-<body style="background-color: #f4f7f6;">
-    <div class="details-container">
-        <a href="browse.php" style="color: #666; text-decoration: none;">&larr; Back to Dashboard</a>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-            <h1><?= htmlspecialchars($itemObj->getTitle()) ?></h1>
-            <?= $itemObj->getDisplayBadge() ?>
-        </div>
 
-        <div class="meta-grid">
-            <div><strong>Reported By:</strong> <?= htmlspecialchars($data['reporter_name']) ?></div>
-            <div><strong>Date:</strong> <?= htmlspecialchars($itemObj->getItemDate()) ?></div>
-            <div><strong>Category:</strong> <?= htmlspecialchars($data['category_name']) ?></div>
-            <div><strong>Location:</strong> <?= htmlspecialchars($data['location_name']) ?></div>
-        </div>
+<div class="page-wrapper">
+    <div class="container">
+        <div style="max-width: 800px; margin: 0 auto;">
 
-        <h3>Description</h3>
-        <p style="line-height: 1.6; color: #444;"><?= nl2br(htmlspecialchars($itemObj->getDescription())) ?></p>
+            <a href="browse.php" style="color: var(--text-light); text-decoration: none; font-size: 0.9rem;">&larr; Back to Browse</a>
 
-        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
-
-        <div style="text-align: center;">
-            <?php if ($itemObj->getType() === 'found' && $itemObj->getUserId() !== $_SESSION['user_id']): ?>
-                <?php if ($hasClaimed): ?>
-                    <div class="alert alert-info">You have already submitted a claim for this item. Please wait for review.</div>
-                <?php else: ?>
-                    <a href="claim.php?id=<?= $itemObj->getId() ?>" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.8rem 2rem;">I Think This Is Mine! (Claim)</a>
-                <?php endif; ?>
-            <?php elseif ($itemObj->getType() === 'lost' && $itemObj->getUserId() !== $_SESSION['user_id']): ?>
-                <button class="btn btn-outline" onclick="alert('Messaging feature coming soon!')">Message Reporter</button>
-            <?php else: ?>
-                <p style="color: #666;"><em>You reported this item.</em></p>
+            <?php if (isset($_GET['claimed'])): ?>
+                <div class="alert alert-success" style="margin-top: 1rem;">Your claim has been submitted! An admin will review it shortly.</div>
             <?php endif; ?>
+
+            <div style="background: var(--white); border-radius: 8px; box-shadow: var(--shadow); padding: 2rem; margin-top: 1.5rem;">
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <h1 style="margin: 0; font-size: 1.6rem;"><?= htmlspecialchars($itemObj->getTitle()) ?></h1>
+                    <?= $itemObj->getDisplayBadge() ?>
+                </div>
+
+                <?php if ($itemObj->getImageUrl()): ?>
+                    <div style="margin-bottom: 1.5rem;">
+                        <img src="../<?= htmlspecialchars($itemObj->getImageUrl()) ?>" alt="<?= htmlspecialchars($itemObj->getTitle()) ?>"
+                             style="max-width: 100%; border-radius: 8px; max-height: 350px; object-fit: cover;">
+                    </div>
+                <?php endif; ?>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #f9fafb; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div><strong>Reported By:</strong> <?= htmlspecialchars($data['reporter_name']) ?></div>
+                    <div><strong>Date:</strong> <?= htmlspecialchars($itemObj->getItemDate()) ?></div>
+                    <div><strong>Category:</strong> <?= htmlspecialchars($data['category_name']) ?></div>
+                    <div><strong>Location:</strong> <?= htmlspecialchars($data['location_name']) ?></div>
+                    <div><strong>Status:</strong>
+                        <span style="text-transform: capitalize; font-weight: 600; color: <?= $data['status'] === 'open' ? 'var(--gold)' : 'var(--green)' ?>;">
+                            <?= htmlspecialchars($data['status']) ?>
+                        </span>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 0.5rem;">Description</h3>
+                <p style="line-height: 1.7; color: #444;"><?= nl2br(htmlspecialchars($itemObj->getDescription())) ?></p>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--gray-light);">
+
+                <div style="text-align: center;">
+                    <?php if ($itemObj->getType() === 'found' && $itemObj->getUserId() !== $_SESSION['user_id'] && $data['status'] === 'open'): ?>
+                        <?php if ($hasClaimed): ?>
+                            <div class="alert alert-info">You've already submitted a claim. Please wait for admin review.</div>
+                        <?php else: ?>
+                            <a href="claim.php?id=<?= $itemObj->getId() ?>" class="btn btn-primary" style="font-size: 1.05rem; padding: 0.8rem 2.5rem;">I Think This Is Mine &mdash; Claim It</a>
+                        <?php endif; ?>
+                    <?php elseif ($itemObj->getType() === 'lost' && $itemObj->getUserId() !== $_SESSION['user_id']): ?>
+                        <button class="btn btn-outline" onclick="alert('Direct messaging is coming soon!')">Message Reporter</button>
+                    <?php else: ?>
+                        <p class="text-muted"><em>You reported this item.</em></p>
+                    <?php endif; ?>
+                </div>
+
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<?php require_once '../includes/footer.php'; ?>

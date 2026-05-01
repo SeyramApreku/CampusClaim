@@ -1,5 +1,7 @@
 <?php
-// items/claim.php
+require_once '../classes/Database.php';
+$pdo = Database::getInstance()->getConnection();
+
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
@@ -9,42 +11,31 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../classes/ItemDAO.php';
 require_once '../classes/ClaimDAO.php';
 
-if (!isset($_GET['id'])) {
-    header("Location: browse.php");
-    exit;
-}
+if (!isset($_GET['id'])) { header("Location: browse.php"); exit; }
 
-$item_id = $_GET['id'];
-$itemDAO = new ItemDAO();
-$data = $itemDAO->getItemById($item_id);
+$item_id  = (int) $_GET['id'];
+$itemDAO  = new ItemDAO();
+$data     = $itemDAO->getItemById($item_id);
 
-if (!$data || $data['type'] !== 'found') {
-    die("You can only claim found items.");
-}
+if (!$data || $data['type'] !== 'found') { header("Location: browse.php"); exit; }
 
 $claimDAO = new ClaimDAO();
 if ($claimDAO->hasUserClaimedItem($_SESSION['user_id'], $item_id)) {
-    die("You have already claimed this item.");
+    header("Location: details.php?id=$item_id");
+    exit;
 }
 
 $errors = [];
+$proof  = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $proof = trim($_POST['proof_description'] ?? '');
-
     if (empty($proof)) {
         $errors[] = "Please provide proof of ownership.";
     }
-
     if (empty($errors)) {
-        $claim = new Claim([
-            'item_id' => $item_id,
-            'user_id' => $_SESSION['user_id'],
-            'proof_description' => $proof
-        ]);
-
+        $claim = new Claim(['item_id' => $item_id, 'user_id' => $_SESSION['user_id'], 'proof_description' => $proof]);
         if ($claimDAO->createClaim($claim)) {
-            // Redirect with success
             header("Location: details.php?id=$item_id&claimed=1");
             exit;
         } else {
@@ -52,47 +43,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$pageTitle = 'Claim Item';
+require_once '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Item | CampusClaim</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-    </style>
-</head>
-<body style="background-color: #f4f7f6;">
-    <div class="form-container">
-        <h2>Claim: <?= htmlspecialchars($data['title']) ?></h2>
-        <p style="color: #666; margin-bottom: 1.5rem;">To claim this item, please provide specific details proving it belongs to you (e.g., serial number, password, unique marks, lock screen wallpaper).</p>
 
-        <?php if (!empty($errors)): ?>
-            <div class="alert alert-error">
-                <?php foreach($errors as $err) echo "<p>$err</p>"; ?>
-            </div>
-        <?php endif; ?>
+<div class="page-wrapper">
+    <div class="container">
+        <div style="max-width: 640px; margin: 0 auto;">
 
-        <form method="POST" action="">
-            <div class="form-group" style="margin-bottom: 1.5rem;">
-                <label>Proof of Ownership</label>
-                <textarea name="proof_description" class="form-control" required rows="5" placeholder="Describe the item specifically..." style="width: 100%; padding: 0.5rem;"></textarea>
+            <a href="details.php?id=<?= $item_id ?>" style="color: var(--text-light); text-decoration: none; font-size: 0.9rem;">&larr; Back to Item</a>
+
+            <div style="background: var(--white); border-radius: 8px; box-shadow: var(--shadow); padding: 2rem; margin-top: 1.5rem;">
+                <h1 style="margin-top: 0; margin-bottom: 0.25rem;">Claim This Item</h1>
+                <p class="text-muted" style="margin-bottom: 1.5rem;">
+                    <strong><?= htmlspecialchars($data['title']) ?></strong><br>
+                    Provide specific details that prove this item belongs to you — e.g., serial number, lock screen password, unique markings, or contents.
+                </p>
+
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-error" style="margin-bottom: 1.25rem;">
+                        <?php foreach ($errors as $err) echo "<p style='margin:0'>$err</p>"; ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="">
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 500; display: block; margin-bottom: 0.4rem;">Proof of Ownership <span style="color: var(--crimson);">*</span></label>
+                        <textarea name="proof_description" class="form-control" required rows="6"
+                                  placeholder="e.g. The phone has a cracked back cover, my name is written inside the case..."><?= htmlspecialchars($proof) ?></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Claim</button>
+                        <a href="details.php?id=<?= $item_id ?>" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+                    </div>
+                </form>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Claim</button>
-                <a href="details.php?id=<?= $item_id ?>" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<?php require_once '../includes/footer.php'; ?>
