@@ -23,47 +23,49 @@ class ExactLocationCategoryStrategy implements MatchingStrategy {
 }
 
 /**
- * Matches items based on Category + Title keywords or Location.
+ * Smart Matching Strategy:
+ * 1. Must be the same Category.
+ * 2. Must have at least one keyword match in the title.
+ * 3. Location match provides a higher 'confidence' but is no longer the sole criteria.
  */
 class FlexibleMatchingStrategy implements MatchingStrategy {
     public function findMatches(Item $item, ItemDAO $dao) {
         $targetType = ($item->getType() === 'lost') ? 'found' : 'lost';
         
-        // 1. Start with Category + Location exact match (highest priority)
-        $exact = $dao->findMatchesByLocationAndCategory(
-            $targetType, 
-            $item->getCategoryId(), 
-            $item->getLocationId()
-        );
-
-        // 2. Add Category + Title keyword matches
-        $keywords = explode(' ', $item->getTitle());
-        // Clean up keywords
+        // Extract keywords from the reported title (ignore common small words)
+        $keywords = explode(' ', strtolower($item->getTitle()));
         $keywords = array_filter($keywords, function($k) {
-            return strlen($k) > 2; // ignore small words
+            return strlen($k) > 2; 
         });
 
-        $keywordMatches = [];
-        if (!empty($keywords)) {
-            $keywordMatches = $dao->findMatchesByKeywords(
-                $targetType,
-                $item->getCategoryId(),
-                $keywords
+        if (empty($keywords)) {
+            // Fallback to Location+Category if title is too short to extract keywords
+            return $dao->findMatchesByLocationAndCategory(
+                $targetType, 
+                $item->getCategoryId(), 
+                $item->getLocationId()
             );
         }
 
-        // Combine and unique by item_id
-        $allMatches = array_merge($exact, $keywordMatches);
-        $uniqueMatches = [];
-        $ids = [];
-        foreach ($allMatches as $m) {
-            if (!in_array($m['item_id'], $ids) && $m['item_id'] != $item->getId()) {
-                $ids[] = $m['item_id'];
-                $uniqueMatches[] = $m;
-            }
-        }
+        // Fetch candidates that share the same Category and at least one keyword
+        $candidates = $dao->findMatchesByKeywords(
+            $targetType,
+            $item->getCategoryId(),
+            $keywords
+        );
 
-        return $uniqueMatches;
+        // Optional: We can further filter or sort these candidates.
+        // For example, prioritize those that ALSO match the location.
+        usort($candidates, function($a, $b) use ($item) {
+            $aLocMatch = ($a['location_id'] == $item->getLocationId());
+            $bLocMatch = ($b['location_id'] == $item->getLocationId());
+            
+            if ($aLocMatch && !$bLocMatch) return -1;
+            if (!$aLocMatch && $bLocMatch) return 1;
+            return 0;
+        });
+
+        return $candidates;
     }
 }
 ?>
