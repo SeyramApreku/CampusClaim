@@ -9,11 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once 'classes/ItemDAO.php';
+require_once 'classes/ItemFactory.php';
+require_once 'classes/MatchingStrategy.php';
 
-$itemDAO = new ItemDAO();
-$userId  = $_SESSION['user_id'];
-$success = '';
-$error   = '';
+$itemDAO  = new ItemDAO();
+$strategy = new FlexibleMatchingStrategy();
+$userId   = $_SESSION['user_id'];
+$success  = '';
+$error    = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $itemId = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
@@ -26,7 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     }
 }
 
-$myItems   = $itemDAO->getItemsByUserId($userId);
+$myItemsRaw = $itemDAO->getItemsByUserId($userId);
+$myItems = [];
+foreach ($myItemsRaw as $itemData) {
+    $itemObj = ItemFactory::createItem($itemData);
+    $itemObj->setId($itemData['item_id']);
+    $matches = $strategy->findMatches($itemObj, $itemDAO);
+    $itemData['match_count'] = count($matches);
+    $myItems[] = $itemData;
+}
+
 $pageTitle = 'My Items';
 require_once 'includes/header.php';
 ?>
@@ -90,14 +102,23 @@ require_once 'includes/header.php';
                                     </span>
                                 </td>
                                 <td style="padding: 1rem; text-align: right;">
-                                    <form method="POST" action="my_items.php" style="display: inline-block;"
-                                          onsubmit="return confirm('Delete this report? This cannot be undone.');">
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
-                                        <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer;">
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                                        <?php if ($item['status'] === 'open' && $item['match_count'] > 0): ?>
+                                            <a href="items/matches.php?id=<?= $item['item_id'] ?>" class="btn" 
+                                               style="background: var(--gold); color: white; padding: 0.4rem 0.8rem; font-size: 0.85rem; text-decoration: none; border-radius: 4px;">
+                                               View Matches (<?= $item['match_count'] ?>)
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <form method="POST" action="my_items.php" style="display: inline-block;"
+                                              onsubmit="return confirm('Delete this report? This cannot be undone.');">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
+                                            <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer;">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
