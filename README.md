@@ -52,4 +52,52 @@ Automated workflows are handled via **GitHub Actions**. Every push to the main b
 1. PHP Linting (Syntax Check)
 2. Docker Build Validation
 
+## Semantic Matching and Grounded Assistant
+
+CampusClaim can optionally index open item reports in Qdrant using OpenAI
+embeddings. The semantic index powers hybrid lost/found matching and an
+authenticated assistant whose answers link back to current CampusClaim reports.
+MySQL remains the source of truth; every vector result is reloaded from MySQL
+before it is shown to a user.
+
+### Setup
+
+1. Apply `migrations/001_ai_search.sql` to an existing database. New databases
+   created from `database.sql` already contain the required tables.
+2. Provision Qdrant and configure the variables documented in `.env.example`.
+3. Leave `AI_FEATURES_ENABLED=false` while applying the migration.
+4. Set `AI_FEATURES_ENABLED=true`, then backfill and process the index:
+
+   ```bash
+   php bin/backfill-index.php
+   php bin/index-worker.php 500
+   ```
+
+5. Run `php bin/index-worker.php 50` continuously or on a short schedule.
+6. After confirming retrieval works, set `RAG_ASSISTANT_ENABLED=true`.
+
+The report workflow writes indexing jobs transactionally. Provider failures are
+retried by the worker and do not block ordinary browsing. Semantic matching
+falls back to the existing keyword strategy when its providers are unavailable.
+
+### AI environment variables
+
+- `OPENAI_API_KEY`: server-side API key; never expose it to browser JavaScript.
+- `OPENAI_EMBEDDING_MODEL`: defaults to `text-embedding-3-small`.
+- `OPENAI_CHAT_MODEL`: generation model used by the assistant.
+- `EMBEDDING_DIMENSIONS`: must match the Qdrant collection vector size.
+- `QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION`: vector-store connection.
+- `AI_FEATURES_ENABLED`: enables indexing and semantic matching.
+- `RAG_ASSISTANT_ENABLED`: independently exposes assistant requests.
+
+### Validation
+
+Run PHP syntax checks and the lightweight test suite inside the application
+container:
+
+```bash
+find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+php tests/run.php
+```
+
 ---

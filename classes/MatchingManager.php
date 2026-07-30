@@ -4,6 +4,9 @@
 require_once 'ItemDAO.php';
 require_once 'MatchingStrategy.php';
 require_once 'NotificationDAO.php';
+require_once 'AIConfig.php';
+require_once 'SemanticMatchingStrategy.php';
+require_once 'MatchScoreDAO.php';
 
 class MatchingManager {
     private $itemDAO;
@@ -14,7 +17,9 @@ class MatchingManager {
         $this->itemDAO = $itemDAO;
         $this->notifDAO = $notifDAO;
         // Default to Flexible matching if none provided
-        $this->strategy = $strategy ?? new FlexibleMatchingStrategy();
+        $this->strategy = $strategy ?? (
+            AIConfig::enabled() ? new SemanticMatchingStrategy() : new FlexibleMatchingStrategy()
+        );
     }
 
     /**
@@ -37,6 +42,21 @@ class MatchingManager {
             $matchTitle = $matchData['title'];
             $newTitle = $newItem->getTitle();
             
+            if (isset($matchData['match_score'])) {
+                $scores = new MatchScoreDAO();
+                $scores->record(
+                    $newItem->getId(),
+                    $matchData['item_id'],
+                    $matchData['semantic_score'],
+                    $matchData['match_score'],
+                    $matchData['match_explanation']
+                );
+                if ($matchData['match_score'] < 0.68
+                    || !$scores->markNotifiedIfNew($newItem->getId(), $matchData['item_id'])) {
+                    continue;
+                }
+            }
+
             $msg = "A new " . $newItem->getType() . " item '" . $newTitle . "' was just reported that might match your " . $matchData['type'] . " item '" . $matchTitle . "'.";
             
             // Link to the details of the new item for the existing owner to check

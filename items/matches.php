@@ -11,6 +11,8 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../classes/ItemDAO.php';
 require_once '../classes/ItemFactory.php';
 require_once '../classes/MatchingStrategy.php';
+require_once '../classes/AIConfig.php';
+require_once '../classes/SemanticMatchingStrategy.php';
 
 if (!isset($_GET['id'])) { header("Location: browse.php"); exit; }
 
@@ -25,7 +27,7 @@ if (!$data || $data['user_id'] !== $_SESSION['user_id']) {
 
 $itemObj  = ItemFactory::createItem($data);
 $itemObj->setId($item_id); // Ensure ID is set for matching logic
-$strategy = new FlexibleMatchingStrategy();
+$strategy = AIConfig::enabled() ? new SemanticMatchingStrategy() : new FlexibleMatchingStrategy();
 $matches  = $strategy->findMatches($itemObj, $itemDAO);
 
 $pageTitle = 'Potential Matches';
@@ -64,6 +66,12 @@ require_once '../includes/header.php';
                     <p style="font-size: 0.9rem; color: #444; line-height: 1.4;">
                         <?= htmlspecialchars(substr($matchObj->getDescription(), 0, 100)) ?>...
                     </p>
+                    <?php if (isset($matchData['match_score'])): ?>
+                        <p style="font-size: 0.85rem; color: #7a1f2b; background: #fff7ed; padding: 0.65rem; border-radius: 6px;">
+                            <strong><?= (int) round($matchData['match_score'] * 100) ?>% potential match</strong><br>
+                            <?= htmlspecialchars($matchData['match_explanation']) ?>
+                        </p>
+                    <?php endif; ?>
                     <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--gray-light);">
                     <a href="details.php?id=<?= $matchObj->getId() ?>" class="btn btn-primary btn-full"
                        style="text-align: center; display: block; text-decoration: none;">View Details &amp; Claim</a>
