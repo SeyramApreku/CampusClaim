@@ -1,9 +1,7 @@
 FROM php:8.2-apache
 
 # Install required PHP extensions
-RUN apt-get update && apt-get install -y --no-install-recommends libcurl4-openssl-dev \
-    && docker-php-ext-install mysqli pdo pdo_mysql curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
 # Create a custom Apache configuration to prevent MPM conflicts
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
