@@ -32,7 +32,7 @@ $base = $inSubfolder ? '../' : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> | CampusClaim</title>
     <meta name="description" content="Centralized lost and found platform for Ashesi University students.">
-    <link rel="stylesheet" href="<?= $base ?>assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= $base ?>assets/css/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web@2.0.3/src/index.js" defer></script>
 </head>
 
@@ -49,7 +49,6 @@ $base = $inSubfolder ? '../' : '';
             <ul class="nav-links">
                 <li><a href="<?= $base ?>items/browse.php">Browse Items</a></li>
                 <li><a href="<?= $base ?>items/report.php">Report Item</a></li>
-                <li><a href="<?= $base ?>assistant.php">Ask Assistant</a></li>
 
                 <?php if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin'): ?>
                     <li><a href="<?= $base ?>my_items.php">My Items</a></li>

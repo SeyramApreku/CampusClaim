@@ -11,11 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 require_once 'classes/ItemDAO.php';
 require_once 'classes/ItemFactory.php';
 require_once 'classes/MatchingStrategy.php';
-require_once 'classes/AIConfig.php';
-require_once 'classes/SemanticMatchingStrategy.php';
 
 $itemDAO  = new ItemDAO();
-$strategy = AIConfig::enabled() ? new SemanticMatchingStrategy() : new FlexibleMatchingStrategy();
+$strategy = new FlexibleMatchingStrategy();
 $userId   = $_SESSION['user_id'];
 $success  = '';
 $error    = '';

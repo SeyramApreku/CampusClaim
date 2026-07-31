@@ -4,8 +4,6 @@
 
 require_once 'Database.php';
 require_once 'ItemFactory.php';
-require_once 'AIConfig.php';
-require_once 'IndexJobDAO.php';
 
 class ItemDAO {
     private $db;
@@ -28,42 +26,27 @@ class ItemDAO {
 
     // Create a new item (Lost or Found) and return the new item_id
     public function createItem(Item $item) {
-        $useOutbox = AIConfig::enabled();
-        if ($useOutbox) $this->db->beginTransaction();
+        $stmt = $this->db->prepare(
+            "INSERT INTO items (user_id, type, title, description, category_id, location_id, item_date, item_time, image_url, status)
+             VALUES (:user_id, :type, :title, :description, :category_id, :location_id, :item_date, :item_time, :image_url, 'open')"
+        );
 
-        try {
-            $stmt = $this->db->prepare(
-                "INSERT INTO items (user_id, type, title, description, category_id, location_id, item_date, item_time, image_url, status)
-                 VALUES (:user_id, :type, :title, :description, :category_id, :location_id, :item_date, :item_time, :image_url, 'open')"
-            );
+        $success = $stmt->execute([
+            ':user_id' => $item->getUserId(),
+            ':type' => $item->getType(),
+            ':title' => $item->getTitle(),
+            ':description' => $item->getDescription(),
+            ':category_id' => $item->getCategoryId(),
+            ':location_id' => $item->getLocationId(),
+            ':item_date' => $item->getItemDate(),
+            ':item_time' => $item->getItemTime() ?: null,
+            ':image_url' => $item->getImageUrl() ?: null
+        ]);
 
-            $success = $stmt->execute([
-                ':user_id' => $item->getUserId(),
-                ':type' => $item->getType(),
-                ':title' => $item->getTitle(),
-                ':description' => $item->getDescription(),
-                ':category_id' => $item->getCategoryId(),
-                ':location_id' => $item->getLocationId(),
-                ':item_date' => $item->getItemDate(),
-                ':item_time' => $item->getItemTime() ?: null,
-                ':image_url' => $item->getImageUrl() ?: null
-            ]);
-
-            if (!$success) {
-                if ($useOutbox) $this->db->rollBack();
-                return false;
-            }
-
-            $itemId = $this->db->lastInsertId();
-            if ($useOutbox) {
-                (new IndexJobDAO($this->db))->enqueue($itemId, 'upsert');
-                $this->db->commit();
-            }
-            return $itemId;
-        } catch (Throwable $e) {
-            if ($useOutbox && $this->db->inTransaction()) $this->db->rollBack();
-            throw $e;
+        if ($success) {
+            return $this->db->lastInsertId();
         }
+        return false;
     }
 
     // Fetch all open items with category and location names, with optional search query and filters
@@ -216,14 +199,10 @@ class ItemDAO {
 
     public function deleteItem($item_id, $user_id) {
         $stmt = $this->db->prepare("DELETE FROM items WHERE item_id = :id AND user_id = :uid");
-        $success = $stmt->execute([
+        return $stmt->execute([
             ':id' => $item_id,
             ':uid' => $user_id
         ]);
-        if ($success && $stmt->rowCount() > 0 && AIConfig::enabled()) {
-            (new IndexJobDAO($this->db))->enqueue($item_id, 'delete');
-        }
-        return $success && $stmt->rowCount() > 0;
     }
 
     // Admin and workflow helper methods
@@ -231,37 +210,10 @@ class ItemDAO {
     // Update the status of an item (e.g. from 'open' to 'claimed' or 'resolved')
     public function updateItemStatus($item_id, $status) {
         $stmt = $this->db->prepare("UPDATE items SET status = :status WHERE item_id = :id");
-        $success = $stmt->execute([
+        return $stmt->execute([
             ':status' => $status,
             ':id' => $item_id
         ]);
-        if ($success && AIConfig::enabled()) {
-            (new IndexJobDAO($this->db))->enqueue(
-                $item_id,
-                $status === 'open' ? 'upsert' : 'delete'
-            );
-        }
-        return $success;
-    }
-
-    public function getItemsByIds(array $ids) {
-        $ids = array_values(array_unique(array_map('intval', $ids)));
-        if (!$ids) return [];
-
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $sql = "SELECT i.*, c.category_name, l.location_name, u.name AS reporter_name
-                FROM items i
-                JOIN categories c ON i.category_id = c.category_id
-                JOIN locations l ON i.location_id = l.location_id
-                JOIN users u ON i.user_id = u.user_id
-                WHERE i.item_id IN ($placeholders)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($ids);
-        $rows = $stmt->fetchAll();
-
-        $byId = [];
-        foreach ($rows as $row) $byId[(int) $row['item_id']] = $row;
-        return $byId;
     }
 }
 ?>
